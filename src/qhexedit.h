@@ -1,6 +1,8 @@
 #ifndef QHEXEDIT_H
 #define QHEXEDIT_H
 
+#include <memory>
+
 #include <QHBoxLayout>
 #include "qhexedit_p.h"
 
@@ -44,13 +46,14 @@ This widget can only handle small amounts of data. The size has to be below 10
 megabytes, otherwise the scroll sliders ard not shown and you can't scroll any
 more.
 */
-        class QHexEdit : public QScrollArea
+class QHexEdit : public QScrollArea
 {
     Q_OBJECT
     /*! Property data holds the content of QHexEdit. Call setData() to set the
     content of QHexEdit, data() returns the actual content.
     */
-    Q_PROPERTY(QByteArray data READ data WRITE setData)
+//    Q_PROPERTY(QByteArray data READ data WRITE setData)
+//    Q_PROPERTY(std::unique_ptr data READ data WRITE setData)
 
     /*! Property addressOffset is added to the Numbers of the Address Area.
     A offset in the address area (left side) is sometimes usefull, whe you show
@@ -144,7 +147,7 @@ public:
     \param len Amount of bytes to remove
     In overwrite mode, the existing bytes will be overwriten with 0x00.
     */
-    void remove(int pos, int len=1);
+    void remove(int pos, int len = 1);
 
     /*! Replaces len bytes from index position pos with the byte array after.
     */
@@ -163,13 +166,13 @@ public:
     int addressOffset();
     void setCursorPosition(int cusorPos);
     int cursorPosition();
-    void setData(QByteArray const &data);
-    QByteArray data();
-    void setAddressAreaColor(QColor const &color);
+    void setData(std::unique_ptr<QHexEditData> data);
+    QHexEditData & data() const;
+    void setAddressAreaColor(QColor const & color);
     QColor addressAreaColor();
-    void setHighlightingColor(QColor const &color);
+    void setHighlightingColor(QColor const & color);
     QColor highlightingColor();
-    void setSelectionColor(QColor const &color);
+    void setSelectionColor(QColor const & color);
     QColor selectionColor();
     void setOverwriteMode(bool);
     bool overwriteMode();
@@ -216,7 +219,7 @@ signals:
     void currentAddressChanged(int address);
 
     /*! Contains the size of the data to edit. */
-    void currentSizeChanged(int size);
+    void currentSizeChanged(size_t size);
 
     /*! The signal is emited every time, the data is changed. */
     void dataChanged();

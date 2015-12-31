@@ -45,7 +45,7 @@ void OptionsDialog::readSettings()
     setColor(ui->lbHighlightingColor, settings.value("HighlightingColor", QColor(0xff, 0xff, 0x99, 0xff)).value<QColor>());
     setColor(ui->lbAddressAreaColor, settings.value("AddressAreaColor", QColor(0xd4, 0xd4, 0xd4, 0xff)).value<QColor>());
     setColor(ui->lbSelectionColor, settings.value("SelectionColor", QColor(0x6d, 0x9e, 0xff, 0xff)).value<QColor>());
-    ui->leWidgetFont->setFont(settings.value("WidgetFont", QFont("Courier", 10)).value<QFont>());
+    ui->leWidgetFont->setFont(settings.value("WidgetFont", QFont("Inconsolata", 12)).value<QFont>());
 
     ui->sbAddressAreaWidth->setValue(settings.value("AddressAreaWidth", 4).toInt());
 }

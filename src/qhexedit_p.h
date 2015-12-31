@@ -3,11 +3,20 @@
 
 /** \cond docNever */
 
+#include <memory>
+
 #include <QtGui>
 #include <QWidget>
 #include <QScrollArea>
 #include <QUndoStack>
+
 #include "xbytearray.h"
+#include "qhexeditdata.h"
+
+typedef enum _CursorArea {
+    CURSORAREA_HEX,
+    CURSORAREA_ASCII
+} CursorArea_t;
 
 class QHexEditPrivate : public QWidget
 {
@@ -22,11 +31,12 @@ public:
     void setAddressOffset(int offset);
     int addressOffset();
 
-    void setCursorPos(int position);
-    int cursorPos();
+    void adjustCursor(size_t position, CursorArea_t area);
+    int cursorPos() const;
+    CursorArea_t cursorArea() const;
 
-    void setData(QByteArray const &data);
-    QByteArray data();
+    void setData(std::unique_ptr<QHexEditData> data);
+    QHexEditData & data();
 
     void setHighlightingColor(QColor const &color);
     QColor highlightingColor();
@@ -40,22 +50,22 @@ public:
     void setSelectionColor(QColor const &color);
     QColor selectionColor();
 
-    XByteArray & xData();
-
-    int indexOf(const QByteArray & ba, int from = 0);
-    void insert(int index, const QByteArray & ba);
-    void insert(int index, char ch);
-    int lastIndexOf(const QByteArray & ba, int from = 0);
-    void remove(int index, int len=1);
-    void replace(int index, char ch);
-    void replace(int index, const QByteArray & ba);
-    void replace(int pos, int len, const QByteArray & after);
+    int indexOf(const QByteArray & ba, size_t from = 0);
+    void insert(size_t index, const QByteArray & ba);
+    void insert(size_t index, char ch);
+    int lastIndexOf(const QByteArray & ba, size_t from = 0);
+    void remove(size_t index, int len = 1);
+    void replace(size_t index, char ch);
+    void replace(size_t index, const QByteArray & ba);
+    void replace(size_t from, int len, const QByteArray & after);
 
     void setAddressArea(bool addressArea);
     void setAddressWidth(int addressWidth);
     void setAsciiArea(bool asciiArea);
     void setHighlighting(bool mode);
+
     virtual void setFont(const QFont &font);
+    virtual const QFont & font() const;
 
     void undo();
     void redo();
@@ -65,18 +75,26 @@ public:
 
 signals:
     void currentAddressChanged(int address);
-    void currentSizeChanged(int size);
+    void currentSizeChanged(size_t size);
     void dataChanged();
     void overwriteModeChanged(bool state);
 
 protected:
     void keyPressEvent(QKeyEvent * event);
+    bool cursorEvent(QKeyEvent * event);
+    bool selectEvent(QKeyEvent * event);
+    bool editEvent(QKeyEvent * event);
+    bool copyEvent(QKeyEvent * event);
+    bool modeEvent(QKeyEvent * event);
+
     void mouseMoveEvent(QMouseEvent * event);
     void mousePressEvent(QMouseEvent * event);
 
     void paintEvent(QPaintEvent *event);
 
-    int cursorPos(QPoint pos);          // calc cursorpos from graphics position. DOES NOT STORE POSITION
+    // calc cursorpos from graphics position. DOES NOT STORE POSITION
+    int calcCursorInfo(QPoint pnt, int & pos, CursorArea_t & area);
+
 
     void resetSelection(int pos);       // set selectionStart and selectionEnd to pos
     void resetSelection();              // set selectionEnd to selectionStart
@@ -92,14 +110,16 @@ private slots:
 private:
     void ensureVisible();
 
+    QFont _monospacedFont;
+
     QColor _addressAreaColor;
     QColor _highlightingColor;
     QColor _selectionColor;
-    QScrollArea *_scrollArea;
+    QScrollArea * _scrollArea;
     QTimer _cursorTimer;
-    QUndoStack *_undoStack;
+    QUndoStack * _undoStack;
 
-    XByteArray _xData;                      // Hält den Inhalt des Hex Editors
+    std::unique_ptr<QHexEditData> _data;
 
     bool _blink;                            // true: then cursor blinks
     bool _renderingRequired;                // Flag to store that rendering is necessary
@@ -118,7 +138,10 @@ private:
     int _selectionEnd;                      // Last selected char
     int _selectionInit;                     // That's, where we pressed the mouse button
 
-    int _size;
+    size_t _size;
+
+
+    CursorArea_t _cursorArea;
 };
 
 /** \endcond docNever */

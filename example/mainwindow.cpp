@@ -9,6 +9,8 @@
 #include <QColorDialog>
 #include <QFontDialog>
 
+#include <memory>
+
 #include "mainwindow.h"
 
 /*****************************************************************************/
@@ -134,7 +136,7 @@ void MainWindow::setOverwriteMode(bool mode)
         lbOverwriteMode->setText(tr("Insert"));
 }
 
-void MainWindow::setSize(int size)
+void MainWindow::setSize(size_t size)
 {
     lbSize->setText(QString("%1").arg(size));
 }
@@ -282,7 +284,7 @@ void MainWindow::createStatusBar()
     lbSize->setFrameShadow(QFrame::Sunken);
     lbSize->setMinimumWidth(70);
     statusBar()->addPermanentWidget(lbSize);
-    connect(hexEdit, SIGNAL(currentSizeChanged(int)), this, SLOT(setSize(int)));
+    connect(hexEdit, SIGNAL(currentSizeChanged(size_t)), this, SLOT(setSize(size_t)));
 
     // Overwrite Mode Label
     lbOverwriteModeName = new QLabel();
@@ -318,7 +320,10 @@ void MainWindow::loadFile(const QString &fileName)
     }
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    hexEdit->setData(file.readAll());
+
+    auto data = QHexEditData::fromByteArray(file.readAll());
+    hexEdit->setData(std::move(data));
+
     QApplication::restoreOverrideCursor();
 
     setCurrentFile(fileName);
@@ -359,7 +364,8 @@ bool MainWindow::saveFile(const QString &fileName)
     }
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    file.write(hexEdit->data());
+    file.write(hexEdit->data().toByteArray());
+
     QApplication::restoreOverrideCursor();
 
     setCurrentFile(fileName);

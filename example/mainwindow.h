@@ -35,7 +35,7 @@ private slots:
     void saveToReadableFile();
     void setAddress(int address);
     void setOverwriteMode(bool mode);
-    void setSize(int size);
+    void setSize(size_t size);
     void showOptionsDialog();
     void showSearchDialog();
 

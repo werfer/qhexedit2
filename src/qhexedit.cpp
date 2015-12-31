@@ -10,7 +10,7 @@ QHexEdit::QHexEdit(QWidget *parent) : QScrollArea(parent)
     setWidgetResizable(true);
 
     connect(qHexEdit_p, SIGNAL(currentAddressChanged(int)), this, SIGNAL(currentAddressChanged(int)));
-    connect(qHexEdit_p, SIGNAL(currentSizeChanged(int)), this, SIGNAL(currentSizeChanged(int)));
+    connect(qHexEdit_p, SIGNAL(currentSizeChanged(size_t)), this, SIGNAL(currentSizeChanged(size_t)));
     connect(qHexEdit_p, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
     connect(qHexEdit_p, SIGNAL(overwriteModeChanged(bool)), this, SIGNAL(overwriteModeChanged(bool)));
     setFocusPolicy(Qt::NoFocus);
@@ -100,7 +100,8 @@ void QHexEdit::setCursorPosition(int cursorPos)
 {
     // cursorPos in QHexEditPrivate is the position of the textcoursor without
     // blanks, means bytePos*2
-    qHexEdit_p->setCursorPos(cursorPos*2);
+//    qHexEdit_p->setCursorPos(cursorPos*2);
+    qHexEdit_p->adjustCursor(cursorPos * 2, CURSORAREA_HEX);
 }
 
 int QHexEdit::cursorPosition()
@@ -108,13 +109,23 @@ int QHexEdit::cursorPosition()
     return qHexEdit_p->cursorPos() / 2;
 }
 
-
+/*
 void QHexEdit::setData(const QByteArray &data)
 {
     qHexEdit_p->setData(data);
 }
 
 QByteArray QHexEdit::data()
+{
+    return qHexEdit_p->data();
+}
+*/
+void QHexEdit::setData(std::unique_ptr<QHexEditData> data)
+{
+    qHexEdit_p->setData(std::move(data));
+}
+
+QHexEditData & QHexEdit::data() const
 {
     return qHexEdit_p->data();
 }

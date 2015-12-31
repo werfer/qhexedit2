@@ -1,4 +1,9 @@
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+lessThan(QT_MAJOR_VERSION, 5): error("This app requires Qt 5.2+")
+equals(QT_MAJOR_VERSION, 5): lessThan(QT_MINOR_VERSION, 2): error("This app requires Qt 5.2+")
+
+QT += widgets
+
+CONFIG += c++14
 
 HEADERS = \
     mainwindow.h \
@@ -7,6 +12,7 @@ HEADERS = \
     ../src/qhexedit_p.h \
     ../src/xbytearray.h \
     ../src/commands.h \
+    ../src/qhexeditdata.h \
     searchdialog.h
 
 
@@ -18,7 +24,9 @@ SOURCES = \
     ../src/qhexedit_p.cpp \
     ../src/xbytearray.cpp \
     ../src/commands.cpp \
+    ../src/qhexeditdata.cpp \
     searchdialog.cpp
+
 
 RESOURCES = \
     qhexedit.qrc

@@ -5,7 +5,7 @@
 
 #include <QtCore>
 
-/*! XByteArray represents the content of QHexEcit.
+/*! XByteArray represents the content of QHexEdit.
 XByteArray comprehend the data itself and informations to store if it was
 changed. The QHexEdit component uses these informations to perform nice
 rendering of the data
